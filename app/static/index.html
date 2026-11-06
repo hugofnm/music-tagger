@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Music Tagger</title>
+<link rel="stylesheet" href="/static/style.css">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💿</text></svg>">
+</head>
+<body>
+<header>
+  <div class="brand">
+    <span class="logo">💿</span>
+    <div>
+      <h1>Music Tagger</h1>
+      <small id="musicdir"></small>
+    </div>
+  </div>
+  <div class="counts" id="counts"></div>
+  <div class="actions">
+    <button id="btn-scan" class="ghost">Rescanner</button>
+    <button id="btn-match-all">Tout matcher</button>
+    <div class="batch">
+      <button id="btn-apply-all" class="primary">Appliquer</button>
+      <label title="Confiance minimale pour l'application en lot">≥ <input id="threshold" type="number" min="50" max="100" value="85">%</label>
+    </div>
+  </div>
+</header>
+<div id="jobbar" class="jobbar hidden">
+  <div class="jobtext"><span id="jobname"></span> <span id="jobcurrent"></span></div>
+  <div class="progress"><div id="jobprogress"></div></div>
+</div>
+
+<main>
+  <aside>
+    <input id="filter-text" type="search" placeholder="Filtrer artiste / album…">
+    <div class="chips" id="chips">
+      <button data-f="all" class="on">Tous</button>
+      <button data-f="todo">À traiter</button>
+      <button data-f="matched">Matchés</button>
+      <button data-f="tagged">Taggés</button>
+      <button data-f="problem">Problèmes</button>
+    </div>
+    <ul id="albums"></ul>
+  </aside>
+
+  <section id="detail">
+    <div class="empty">
+      <p>👈 Choisis un album à gauche.</p>
+      <p class="muted">« Tout matcher » cherche chaque album sur Deezer. Vérifie ensuite les correspondances et applique album par album, ou en lot au-dessus d'un seuil de confiance.</p>
+    </div>
+  </section>
+</main>
+
+<template id="tpl-detail">
+  <div class="cards">
+    <div class="card local">
+      <div class="cover"><img data-k="localcover" alt=""></div>
+      <div class="info">
+        <span class="label">Local</span>
+        <h2 data-k="title"></h2>
+        <p data-k="artist"></p>
+        <p class="muted mono" data-k="dir"></p>
+        <p class="muted" data-k="ntracks"></p>
+      </div>
+    </div>
+    <div class="arrow">→</div>
+    <div class="card remote">
+      <div class="cover"><img data-k="dzcover" alt=""></div>
+      <div class="info">
+        <span class="label">Deezer <a data-k="dzlink" target="_blank" rel="noopener">↗</a></span>
+        <h2 data-k="dztitle"></h2>
+        <p data-k="dzartist"></p>
+        <p class="muted" data-k="dzmeta"></p>
+        <div class="conf"><div class="bar"><div data-k="confbar"></div></div><span data-k="conf"></span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <button data-a="automatch">Matcher auto</button>
+    <button data-a="togglesearch" class="ghost">Chercher un autre album…</button>
+    <span class="spacer"></span>
+    <button data-a="restore" class="ghost danger hidden">Annuler (restaurer)</button>
+    <button data-a="apply" class="primary">Écrire les tags</button>
+  </div>
+
+  <div class="search hidden" data-k="searchbox">
+    <form data-a="search">
+      <input name="q" placeholder="Recherche libre, ou colle une URL / ID d'album Deezer">
+      <button>Chercher</button>
+    </form>
+    <div class="results" data-k="results"></div>
+  </div>
+
+  <details class="options" open>
+    <summary>Options d'écriture</summary>
+    <div class="opts">
+      <label><input type="radio" name="mode" value="overwrite"> Remplacer par les infos Deezer</label>
+      <label><input type="radio" name="mode" value="fill"> Compléter seulement (garder titre/artiste/album actuels)</label>
+      <label><input type="checkbox" name="embed_cover"> Intégrer la pochette dans les fichiers</label>
+      <label><input type="checkbox" name="cover_file"> Créer cover.jpg dans le dossier</label>
+      <label><input type="checkbox" name="tag_unmatched"> Infos d'album aussi sur les fichiers non rapprochés</label>
+      <label><input type="checkbox" name="rename"> Renommer en « 01 - Titre.flac »</label>
+    </div>
+  </details>
+
+  <p class="message" data-k="message"></p>
+
+  <table class="tracks">
+    <thead><tr><th>#</th><th>Fichier</th><th>Titre actuel</th><th>Piste Deezer</th><th>Durée</th><th>Score</th></tr></thead>
+    <tbody data-k="tbody"></tbody>
+  </table>
+</template>
+
+<div id="toast"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
