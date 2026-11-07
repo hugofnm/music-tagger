@@ -3,13 +3,12 @@ services:
     build: .
     image: music-tagger:latest
     container_name: music-tagger
-    # UID:GID du propriétaire de tes fichiers musique (sinon écriture refusée sur le NAS)
     user: "1000:1000"
     ports:
       - "8080:8080"
     volumes:
-      - /chemin/vers/ta/musique:/music        # ← à adapter (dossier racine de la bibliothèque)
-      - ./data:/data                           # sauvegardes des tags d'origine
+      - ${MUSICPATH:-.}:/music        # ← à adapter (dossier racine de la bibliothèque)
+      - ${DATAPATH:-.}:/data                           # sauvegardes des tags d'origine
     environment:
       - COVER_SIZE=1200      # taille de la pochette en px (Deezer : 1000 garanti, jusqu'à ~1800)
       - AUTO_SCAN=1          # scanner au démarrage
